@@ -12,12 +12,12 @@
 
   .tree-view
     white-space: nowrap
-    width: 230px
-    height:100%
+    width: 100%
     transition: width .3s
-    .selected
-      color: #1976d2
-      background: #eee
+    color:#fff
+    /*.selected*/
+      /*color: #1976d2*/
+      /*background: #eee*/
     .button
       .icon
         margin-right:5px
@@ -48,6 +48,9 @@
           background-color: #eee
           color: #1976d2
           unSelectedCharacter()
+      .router-link-active
+        color: #fff!important
+        background: #2d8cf0!important
   .treeViewMini
     transform: translate(0, 0)
     width: 50px !important
@@ -66,7 +69,7 @@
           margin: 0 1px
           background: bgColor
     .link
-      width: 150px
+      width: 100%
     > .level
       position: relative
     > .level-1
@@ -112,10 +115,6 @@
   unSelectedCharacter {
     user-select: none
   }
-
-  .router-link-active
-    color: #1976d2
-
 </style>
 <template>
   <div class="tree-view">

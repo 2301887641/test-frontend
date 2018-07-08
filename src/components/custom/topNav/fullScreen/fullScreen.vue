@@ -1,16 +1,11 @@
 <style lang="stylus" rel="stylesheet/stylus" scoped>
-  .fullScreen
-    display: inline-block
-    width: 30px
-    text-align: left
-    cursor: pointer
+  @import '../../../../assets/css/common.styl'
+
 </style>
 <template>
-  <div class="fullScreen" @click="toggle">
-    <Tooltip :content="value?'退出全屏':'全屏'" placement="bottom">
-      <Icon :type="value ? 'arrow-shrink' : 'arrow-expand'" size="23"></Icon>
+    <Tooltip class="topIcon" :content="value?'退出全屏':'全屏'" placement="bottom">
+      <Icon class="cursor-pointer" @click="toggle" :type="value ? 'arrow-shrink' : 'arrow-expand'" size="23"/>
     </Tooltip>
-  </div>
 </template>
 
 <script>

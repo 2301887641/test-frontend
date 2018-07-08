@@ -4,7 +4,7 @@ import router from './router'
 //设置常量
 import CONSTANSTS from './assets/js/utils/constants'
 
-Vue.prototype.$canstansts = CONSTANSTS
+Vue.prototype.$constants = CONSTANSTS
 // 本地存储localstory
 import Lockr from 'lockr'
 
@@ -30,6 +30,7 @@ import treeMenu from './assets/js/plugins/menu'
 Vue.use(treeMenu)
 //store
 import store from './store/index'
+
 Vue.config.productionTip = false
 //font-awesome
 import 'font-awesome/css/font-awesome.min.css'
@@ -40,5 +41,9 @@ new Vue({
   router,
   store,
   components: {App},
-  template: '<App/>'
+  template: '<App/>',
+  //挂载后调用
+  mounted(){
+    this.$store.commit("init")
+  }
 })

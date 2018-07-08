@@ -21,6 +21,14 @@ let menuUtils = {
       }
     }
   },
+  //与头部nav进行级联 无法使用init方法 因为this.routeSwitching = true了
+  cascade:function(menu, path){
+    if (path.length > 2 && !this.shrink) {
+        this.clear()
+        this.setExpand(menu, path, this.setExpand, this)
+        this.setExpandAfter()
+    }
+  },
   //寻找父类
   findParent: function (current, previous) {
     //判断前一个展开的是否是父级
@@ -143,7 +151,6 @@ let menuUtils = {
         treeViewArr[i].className = "tree-view"
       }
     }
-
   },
   //清理button的selected状态
   cleanButton() {
@@ -167,8 +174,8 @@ let menuUtils = {
       //清理收缩状态下的选中
       this.cleanButton()
       //展开菜单
-      this.shrink = false
       this.sprinkInit(menu, path)
+      this.shrink = false
     }
   },
   //获取收缩状态

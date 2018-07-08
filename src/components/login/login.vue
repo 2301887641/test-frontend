@@ -4,7 +4,7 @@
     background-size: cover
     .login
       width: 350px
-      height: 450px
+      height: 440px
       margin-left: -(@width/ 2)
       margin-top: -(@height/ 2)
       position: absolute
@@ -29,31 +29,31 @@
       </div>
       <div class="login_form">
         <Form ref="loginForm" :model="formData" :rules="verifyRule">
-          <Form-item prop="username">
+          <FormItem  prop="username">
             <Input type="text" v-model="formData.username" placeholder="请输入用户名">
             <Icon type="person" slot="prepend"></Icon>
             </Input>
-          </Form-item>
-          <Form-item prop="password">
+          </FormItem>
+          <FormItem  prop="password">
             <Input type="password" v-model="formData.password" placeholder="请输入密码">
             <Icon type="ios-locked" slot="prepend"></Icon>
             </Input>
-          </Form-item>
-          <Form-item prop="captcha">
+          </FormItem>
+          <FormItem  prop="captcha" style="margin-bottom:30px;">
             <Row>
               <Col span="12">
               <Input type="text" v-model="formData.captcha" placeholder="请输入验证码">
               <Icon type="eye" slot="prepend"></Icon>
               </Input>
               </Col>
-              <Col span="10" justify="end" push="2">
+              <Col span="12" justify="end" push="2" style="height:28px;">
               <img class="login_captcha" :src="captchaSrc" width="132" height="32" alt="验证码" @click="refreshCaptcha">
               </Col>
             </Row>
-          </Form-item>
-          <Form-item>
-            <Button type="primary" long :loading="load" @click="login('loginForm')">登录</Button>
-          </Form-item>
+          </FormItem>
+          <FormItem>
+            <Button type="primary" long :loading="load" size="large" @click="login('loginForm')">登录</Button>
+          </FormItem>
         </Form>
       </div>
     </div>
@@ -67,13 +67,15 @@
       return {
         // 加载状态
         load: false,
+        errorMsg:'',
         // 验证码地址
-        captchaSrc: this.$canstansts.captchaSrc,
+        captchaSrc: this.$constants.captchaSrc,
         // 表单
         formData: {
           username: '',
           password: '',
-          captcha: ''
+          captcha: '',
+          client_name:this.$constants.restClient
         },
         //验证规则
         verifyRule: {
@@ -97,17 +99,16 @@
             return false
           }
           this.load = true
-          this.$Http.post("login/user", this.formData, (result) => {
-            this.load = false
-            if(result.token){
-              this.$lockr.set("user_token",result.token)
+          this.$Http.post("login", this.formData, (status,result) => {
+            if (status && result.token) {
+              this.$lockr.set("user_token", result.token)
               this.$router.replace("index")
             }
-          })
+          }, this)
         })
       },
       refreshCaptcha() {
-        this.captchaSrc = this.$canstansts.captchaSrc + '?id=' + Math.random()
+        this.captchaSrc = this.$constants.captchaSrc + '?id=' + Math.random()
       }
     }
   }
