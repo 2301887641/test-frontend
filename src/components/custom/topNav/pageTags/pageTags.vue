@@ -62,7 +62,7 @@
     data() {
       return {
         //默认开启的页面
-        defaultOpenedPageName: this.$constants.defaultOpenedPage,
+        defaultOpenedPageName: this.$constants.router.defaultOpenedPage,
         //当前路由名称
         currentPageName: this.$route.name,
         //距离左边的默认值
@@ -138,7 +138,7 @@
       refreshFactory(){
         let children,index
         children = this.$refs.transitionParent.$children
-        if (children.length > 0) {
+        if (children.length > 0 && children[0].$children.length>0) {
           index=this.$store.state.menu.pageOpendName.indexOf(this.currentPageName)
           this.refresh(children[index].$el,this.currentPageName)
         }
@@ -148,6 +148,8 @@
     watch: {
       '$route'(to) {
         this.currentPageName = to.name
+        //点击左侧菜单时,需要触发添加到缓存中 才可以显示
+        this.$store.dispatch("increment",to.name)
         this.$nextTick(() => {
           this.refreshFactory()
         })

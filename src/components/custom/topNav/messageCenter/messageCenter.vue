@@ -19,10 +19,11 @@
       toggle() {
         //vux分组后，actions还是使用这样的调用方式
         this.$store.dispatch("increment","home_message")
+        //跳转路由
         this.$router.push({
           name:"home_message"
         })
-        this.$root.publish_openMenu.$emit('openMenu', "home_message",event.target)
+        //this.$root.publish_openMenu.$emit('openMenu', "home_message",event.target)
       }
     },
     props: {

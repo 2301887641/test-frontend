@@ -35,6 +35,8 @@ Vue.config.productionTip = false
 //font-awesome
 import 'font-awesome/css/font-awesome.min.css'
 
+import iconArr from "./assets/js/plugins/embedIcon.js"
+
 /* eslint-disable no-new */
 new Vue({
   el: '#app',

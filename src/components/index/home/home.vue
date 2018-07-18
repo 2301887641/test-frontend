@@ -52,8 +52,11 @@
             box-shadow: 0 0 0 2px rgba(255, 255, 255, .2)
         .menu_tag
           display: inline-block
-          width: 300px
+          width: 340px
           line-height: 60px
+          font-size:13px
+          .ivu-breadcrumb
+            font-size:12px
         .avator_container
           position: absolute
           right: 0
@@ -108,7 +111,7 @@
         </div>
         <!--面包屑-->
         <div class="menu_tag">
-          <breadcrumbNav/>
+          <breadcrumbNav :data="breadcrumb"/>
         </div>
         <!--右侧全屏和消息提醒-->
         <div class="avator_container">
@@ -169,6 +172,7 @@
         isFull: false,
         //消息总数
         messageCount: 3,
+        breadcrumb:[],
         avatorPath: "https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3448484253,3685836170&fm=27&gp=0.jpg"
       }
     },
@@ -182,6 +186,15 @@
     created() {
       this.menu = this.$store.state.menu.menu
     },
+  //使用watch方法监听路由变化
+  watch: {
+    '$route'(to) {
+      this.currentPageName = to.name
+      this.$nextTick(() => {
+        this.breadcrumb=this.$menu.getBreadcrumb()
+      })
+    }
+  },
     //缓存数据
     computed: {
       pageList() {
@@ -189,10 +202,6 @@
       }
     },
     methods: {
-      keys(){
-        console.log(this.$route.name)
-        return "1"
-      },
       //切换菜单
       toggle() {
         this.$menu.toggleMenu(this.menu, this.$route.path)

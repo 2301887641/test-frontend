@@ -2,10 +2,10 @@
 import Axios from 'axios'
 import Constants from './constants'
 
-Axios.defaults.baseURL = Constants.domain
-Axios.defaults.timeout = Constants.timeout
-Axios.defaults.headers['Content-Type'] = Constants.contentType
-Axios.defaults.withCredentials = Constants.withCredentials
+Axios.defaults.baseURL = Constants.network.domain
+Axios.defaults.timeout = Constants.axios.timeout
+Axios.defaults.headers['Content-Type'] = Constants.axios.contentType
+Axios.defaults.withCredentials = Constants.axios.withCredentials
 //qs将axios发送的json转成form-data
 import Qs from 'qs'
 
@@ -22,6 +22,9 @@ let http = {
   },
   // ajax post请求
   post(url, data, callback, vueInstance) {
+    if(vueInstance.alertable!==undefined && !!vueInstance.alertable){
+      vueInstance.alertable=false
+    }
     Axios.post(url, Qs.stringify(data)).then((response) => {
       this.unload(vueInstance)
       this.callbackFunc(response, callback)
@@ -43,15 +46,19 @@ let http = {
     if (error.response && error.response.status) {
       switch(error.response.status){
         case 401:
-          notice.title="登陆失败!"
-          notice.desc = "用户名或密码错误,请重新输入!"
-          notice.duration = 7
+          visible=false
+          vueInstance.$Message.destroy()
+          vueInstance.$Message.error({
+            content: Constants.user.loginErrorMsg,
+            duration: 7,
+            closable: true
+          })
           break;
         default:
           notice.desc = "网络请求失败,请稍后重新请求!"
       }
     }
-    !!visible && vueInstance.$Notice.error({
+    !!visible && vueInstance.$Notice.destroy() && vueInstance.$Notice.error({
       title: notice.title,
       desc: notice.desc,
       duration:notice.duration
@@ -60,8 +67,12 @@ let http = {
   },
   // 回调
   callbackFunc(response, callback) {
-    if (response.status === 200) {
-      callback(true,response.data)
+    switch(response.status){
+      case 200:
+        callback(true,response.data)
+        break;
+      default:
+        break;
     }
   }
 }

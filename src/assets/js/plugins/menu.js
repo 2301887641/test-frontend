@@ -11,6 +11,8 @@ let menuUtils = {
   routeSwitching: false,
   //是否收缩
   shrink: false,
+  //面包屑数组
+  breadcrumbArr:[],
   //初始化方法
   init: function (menu, path) {
     if (path.length > 2) {
@@ -187,6 +189,21 @@ let menuUtils = {
     if (path.length > 2) {
       this.setExpand(menu, path, this.setExpand, this)
     }
+  },
+  setBreadcrumb(linkName){
+    this.breadcrumbArr=[]
+    if(this.map.size>0){
+      let mapArr=[...this.map.values()]
+      let _this=this
+      mapArr.forEach(function(item,index){
+         item.element.isExpanded && _this.breadcrumbArr.push(item.element.name)
+      })
+    }
+    this.preExpanded.name && this.breadcrumbArr.push(this.preExpanded.name)
+    this.breadcrumbArr.push(linkName)
+  },
+  getBreadcrumb(){
+    return this.breadcrumbArr;
   }
 }
 

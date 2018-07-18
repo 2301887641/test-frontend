@@ -161,6 +161,7 @@
     methods: {
       dropToggle(item) {
         !this.$menu.getShrink() && this.$menu.toggleStatus(item)
+        this.$menu.setBreadcrumb(item.name)
       }
     },
     created() {

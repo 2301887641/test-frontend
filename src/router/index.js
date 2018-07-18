@@ -21,8 +21,9 @@ const router = new Router({
       component: Home,
       redirect: '/index',
       children:[
-        Constants.router.home.home_index,
-        Constants.router.home.home_message,
+        Constants.router.router.home.home_index,
+        Constants.router.router.home.home_message,
+        Constants.router.router.permission.permission_resource
       ]
     }
   ]

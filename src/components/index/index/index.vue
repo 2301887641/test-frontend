@@ -152,7 +152,7 @@
         todoInputModal: '',
         //统计数据
         addUsers:{
-          iconType:"android-person-add",
+          iconType:"android-person-topNav",
           backgroundColor:"dodgerblue",
           number:555,
           info:"今日新增用户"
@@ -211,6 +211,10 @@
       ok() {
 
       }
+    },
+    created(){
+      //清除登陆loding
+      this.$Spin.hide()
     },
     components: {
       todoList,countCard,mapService,chinaMap

@@ -29,17 +29,17 @@
       </div>
       <div class="login_form">
         <Form ref="loginForm" :model="formData" :rules="verifyRule">
-          <FormItem  prop="username">
+          <FormItem prop="username">
             <Input type="text" v-model="formData.username" placeholder="请输入用户名">
             <Icon type="person" slot="prepend"></Icon>
             </Input>
           </FormItem>
-          <FormItem  prop="password">
+          <FormItem prop="password">
             <Input type="password" v-model="formData.password" placeholder="请输入密码">
             <Icon type="ios-locked" slot="prepend"></Icon>
             </Input>
           </FormItem>
-          <FormItem  prop="captcha" style="margin-bottom:30px;">
+          <FormItem prop="captcha" style="margin-bottom:30px;">
             <Row>
               <Col span="12">
               <Input type="text" v-model="formData.captcha" placeholder="请输入验证码">
@@ -67,15 +67,16 @@
       return {
         // 加载状态
         load: false,
-        errorMsg:'',
+        alertable:false,
+        alertMessage:'',
         // 验证码地址
-        captchaSrc: this.$constants.captchaSrc,
+        captchaSrc: this.$constants.network.captchaSrc,
         // 表单
         formData: {
           username: '',
           password: '',
           captcha: '',
-          client_name:this.$constants.restClient
+          client_name: this.$constants.restClient
         },
         //验证规则
         verifyRule: {
@@ -91,6 +92,13 @@
         }
       }
     },
+    created(){
+      //获取token 去服务器验证合法性
+      let token=this.$lockr.get(this.$constants.user.token);
+      if(token){
+        // this.$Spin.show()
+      }
+    },
     methods: {
       login(name) {
         this.$refs[name].validate((valid) => {
@@ -99,16 +107,29 @@
             return false
           }
           this.load = true
-          this.$Http.post("login", this.formData, (status,result) => {
-            if (status && result.token) {
-              this.$lockr.set("user_token", result.token)
-              this.$router.replace("index")
+          this.$Http.post("login", this.formData, (status, result) => {
+            if (status) {
+              switch (result.retCode) {
+                case this.$constants.statusCode.CAPTCHA_ERROR:
+                  this.$Message.error({
+                    content: result.retInfo,
+                    duration: 5,
+                    closable: true
+                  })
+                  break;
+                case this.$constants.statusCode.SUCCESS:
+                  this.$Spin.show()
+                  this.$lockr.set(this.$constants.user.token, result.data.token)
+                  this.$router.replace("index")
+                  break;
+              }
             }
           }, this)
         })
       },
+      //刷新验证码
       refreshCaptcha() {
-        this.captchaSrc = this.$constants.captchaSrc + '?id=' + Math.random()
+        this.captchaSrc = this.$constants.network.captchaSrc + '?id=' + Math.random()
       }
     }
   }

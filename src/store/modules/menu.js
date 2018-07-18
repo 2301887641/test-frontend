@@ -11,23 +11,13 @@ const menu = {
       {
         id: 1,
         level: 1,
-        name: 'top1',
-        isExpanded: false,
-        isSelected: false,
-        type: 'button',
-        url: '/detail/a',
-        parentId: 0
-      },
-      {
-        id: 2,
-        level: 1,
-        name: 'top2',
+        name: '权限管理',
         type: 'button',
         isExpanded: false,
         isSelected: false,
         parentId: 0,
         subMenu: [
-          {id: 21, level: 2, parentId: 2, name: '简介', type: 'link', url: '/index'},
+          {id: 21, level: 2, parentId: 2, name: '资源管理', type: 'link', url: '/resource'},
           {id: 41, level: 2, parentId: 2, name: '消息', type: "link", url: "/message"},
           {id: 42, level: 2, parentId: 2, name: '语言服务', type: "link", url: "/detail/language-service"},
           {id: 43, level: 2, parentId: 2, name: '安全', type: "link", url: "/detail/security"},
@@ -67,7 +57,7 @@ const menu = {
                 isExpanded: false,
                 isSelected: false,
                 subMenu: [
-                  {id: 449, level: 3, parentId: 444, name: '搭建本地开发环境222', type: "link", url: "/detail2/setup"}
+                  {id: 449, level: 3, parentId: 444, name: '搭建本地开发环境222', type: "link", url: "/message"}
                 ]
               },
             ]
@@ -91,7 +81,7 @@ const menu = {
       }
     ],
     //已经点开的页面列表
-    pageOpendList: [Constants.defaultOpenedPage],
+    pageOpendList: [Constants.router.defaultOpenedPage],
     //记录已经点开的名称和索引
     pageOpendName: ["home_index"]
   },
@@ -112,8 +102,8 @@ const menu = {
         return true
       }
       let router, temp = {}
-      for (let item in Constants.router) {
-        router = Constants.router[item][routeName]
+      for (let item in Constants.router.router) {
+        router = Constants.router.router[item][routeName]
         if (router) {
           temp.name = router.name
           temp.title = router.title
@@ -157,7 +147,7 @@ const menu = {
       Lockr.set("cacheOpendPage", JSON.stringify(state.pageOpendList))
       Lockr.set("cacheOpendPageName", JSON.stringify(state.pageOpendName))
       Router.push({
-        name: Constants.defaultOpenedPage.name
+        name: Constants.router.defaultOpenedPage.name
       })
     },
     //关闭除了当前和首页外的所有
