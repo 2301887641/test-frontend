@@ -67,16 +67,14 @@
       return {
         // 加载状态
         load: false,
-        alertable:false,
-        alertMessage:'',
         // 验证码地址
-        captchaSrc: this.$constants.network.captchaSrc,
+        captchaSrc: this.$constants.baseConfig.captchaSrc,
         // 表单
         formData: {
           username: '',
           password: '',
           captcha: '',
-          client_name: this.$constants.restClient
+          client_name: this.$constants.baseConfig.restClient
         },
         //验证规则
         verifyRule: {
@@ -129,7 +127,7 @@
       },
       //刷新验证码
       refreshCaptcha() {
-        this.captchaSrc = this.$constants.network.captchaSrc + '?id=' + Math.random()
+        this.captchaSrc = this.$constants.baseConfig.captchaSrc + '?id=' + Math.random()
       }
     }
   }

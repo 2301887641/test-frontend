@@ -10,7 +10,7 @@
       justify-content: space-between
 </style>
 <template>
-  <div class="topNav">
+  <div class="topNav" style="margin-bottom:15px;">
     <div class="action">
       <span>
         <Button type="error" icon="trash-a" @click="deleteAll">批量删除</Button>

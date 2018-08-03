@@ -15,6 +15,7 @@ import iView from 'iview'
 import './assets/css/iviews.css'
 // vue上使用iview
 Vue.use(iView)
+
 // 粒子效果
 import VueParticles from 'vue-particles'
 // vue上使用粒子效果
@@ -35,10 +36,11 @@ Vue.config.productionTip = false
 //font-awesome
 import 'font-awesome/css/font-awesome.min.css'
 
-import iconArr from "./assets/js/plugins/embedIcon.js"
+import ZkTable from 'vue-table-with-tree-grid'
+Vue.use(ZkTable)
 
 /* eslint-disable no-new */
-new Vue({
+let vue=new Vue({
   el: '#app',
   router,
   store,
@@ -49,3 +51,7 @@ new Vue({
     this.$store.commit("init")
   }
 })
+//初始化操作
+vue.$Message.config({
+  duration: 5
+});

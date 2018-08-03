@@ -2,77 +2,123 @@
 import Axios from 'axios'
 import Constants from './constants'
 
-Axios.defaults.baseURL = Constants.network.domain
+Axios.defaults.baseURL = Constants.baseConfig.domain
 Axios.defaults.timeout = Constants.axios.timeout
 Axios.defaults.headers['Content-Type'] = Constants.axios.contentType
+//识别ajax请求
+Axios.defaults.headers['X-Requested-With'] =Constants.axios.xRequestedWith
 Axios.defaults.withCredentials = Constants.axios.withCredentials
 //qs将axios发送的json转成form-data
 import Qs from 'qs'
 
 let http = {
-  get(url, callback,vueInstance) {
-    Axios.get(url, config).then((response) => {
-      this.unload(vueInstance)
+  //模式 分为静默和正常  静默模式不会给出反馈信息
+  //true:正常模式  false:静默方式
+  pattern:true,
+  get(url, callback, vue) {
+    Axios.get(url).then((response) => {
+      this.unload(vue)
       // 正确接收到响应后我们的所有数据都在data里面
-      this.callbackFunc(response, callback)
+      this.callbackFactory(response, callback, vue)
+      if(!this.pattern){
+        this.pattern=true
+      }
     }).catch((error) => {
-      this.unload(vueInstance)
-      this.errorHandler(error,vueInstance)
+      this.unload(vue)
+      this.errorHandler(callback, error, vue)
     })
   },
   // ajax post请求
-  post(url, data, callback, vueInstance) {
-    if(vueInstance.alertable!==undefined && !!vueInstance.alertable){
-      vueInstance.alertable=false
-    }
+  post(url, data, callback, vue) {
     Axios.post(url, Qs.stringify(data)).then((response) => {
-      this.unload(vueInstance)
-      this.callbackFunc(response, callback)
+      this.unload(vue)
+      this.callbackFactory(response, callback, vue)
     }).catch((error) => {
-      this.unload(vueInstance)
-      this.errorHandler(callback,error,vueInstance)
+      this.unload(vue)
+      this.errorHandler(callback, error, vue)
+    })
+  },
+  // ajax put请求
+  put(url, data, callback, vue) {
+    Axios.put(url, Qs.stringify(data)).then((response) => {
+      this.unload(vue)
+      this.callbackFactory(response, callback, vue)
+    }).catch((error) => {
+      this.unload(vue)
+      this.errorHandler(callback, error, vue)
     })
   },
   //取消load状态
-  unload(vueInstance){
-    if(vueInstance && vueInstance.$data && vueInstance.$data.load){
-      vueInstance.$data.load = false
+  unload(vue) {
+    if (vue && vue.$data && vue.$data.load) {
+      vue.$data.load = false
     }
   },
   //错误处理器
-  errorHandler(callback,error,vueInstance){
-    let notice = {title: "网络异常", desc: "网络连接异常,请联系客服!",duration:4.5},visible=true
+  errorHandler(callback, error, vue) {
+    let notice = {title: "网络异常", desc: "网络连接异常,请联系客服!", duration: 6}
     // 请求已发出，但服务器响应的状态码不在 2xx 范围内
     if (error.response && error.response.status) {
-      switch(error.response.status){
+      vue.$Message.destroy()
+      switch (error.response.status) {
         case 401:
-          visible=false
-          vueInstance.$Message.destroy()
-          vueInstance.$Message.error({
-            content: Constants.user.loginErrorMsg,
-            duration: 7,
-            closable: true
-          })
+          notice.title = "认证异常"
+          notice.desc = Constants.user.authorationError
+          break;
+        case 500:
+          notice.title = "程序异常"
+          notice.desc = Constants.user.fatalError
           break;
         default:
-          notice.desc = "网络请求失败,请稍后重新请求!"
+          break;
       }
+      vue.$Notice.error({
+        title: notice.title,
+        desc: notice.desc,
+        duration: notice.duration,
+      })
+      return
     }
-    !!visible && vueInstance.$Notice.destroy() && vueInstance.$Notice.error({
+    vue.$Notice.error({
       title: notice.title,
       desc: notice.desc,
-      duration:notice.duration
+      duration: notice.duration,
     })
-    callback(false,error.response.status)
   },
   // 回调
-  callbackFunc(response, callback) {
-    switch(response.status){
+  callbackFactory(response, callback, vue) {
+    switch (response.status) {
       case 200:
-        callback(true,response.data)
+        switch (response.data.retCode) {
+          case Constants.statusCode.SUCCESS:
+            callback(true, response.data)
+            //弹窗提示成功
+            this.success(vue, response)
+            break;
+          case Constants.statusCode.FATAL_ERROR:
+            vue.$Notice.error({
+              title: "程序异常",
+              desc: "程序发生错误,请联系后台人员!",
+              duration:6,
+            })
+            break;
+          default:
+            callback(true, response.data)
+            break;
+        }
         break;
       default:
         break;
+    }
+  },
+  //成功后的自动处理
+  success(vue, response) {
+    if (!!this.pattern && response.data.retInfo != undefined && response.data.retInfo.length > 0) {
+      vue.$Notice.success({title: response.data.retInfo})
+    }
+    //如果vue视图上有模型model的话关闭掉。
+    if (vue.$data.model !== undefined && !!vue.$data.model) {
+      vue.$data.model = false
     }
   }
 }
