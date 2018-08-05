@@ -16,6 +16,7 @@ const CONSTANTS = {
     timeout: 1000 * 15,
     //跨域必开
     withCredentials:true,
+    xRequestedWith:"XMLHttpRequest"
   },
   //用户相关
   user:{
@@ -38,11 +39,11 @@ const CONSTANTS = {
   //后台返回状态码
   statusCode:{
     //成功
-    SUCCESS:'0000',
+    SUCCESS:200,
     //验证码错误
-    CAPTCHA_ERROR:'1000',
+    CAPTCHA_ERROR:1000,
     //后台致命错误
-    FATAL_ERROR:'5000'
+    FATAL_ERROR:5000
   },
   //枚举
   enum:{
