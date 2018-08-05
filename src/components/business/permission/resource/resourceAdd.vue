@@ -111,6 +111,7 @@
           code: '',
           url: '',
           priority: 0,
+          path:'',
           parentName:this.parentResourceInfo.parentName
         },
         verifyRule: {
@@ -139,6 +140,7 @@
       },
       'parentResourceInfo.parentId'(){
         this.form.parentId=this.parentResourceInfo.parentId
+        this.form.path=this.parentResourceInfo.parentId
       }
     },
     props:{

@@ -32,7 +32,7 @@
         <template slot="action" slot-scope="scope">
           <Button type="primary" size="small" @click="edit(scope.row.id)">编辑</Button>
           <Button type="success" size="small" @click="addChild(scope.row)">添加下级</Button>
-          <Button type="error" size="small">删除</Button>
+          <Button type="error" size="small" :loading="load" @click="remove(scope.row.id)">删除</Button>
         </template>
       </zk-table>
     </div>
@@ -45,11 +45,14 @@
   import topNav from '../../../custom/rightHome/topNav/topNav'
   import Add from './resourceAdd'
   import Edit from './resourceEdit'
+  import vue from 'vue'
 
   export default {
     name: "resource",
     data() {
       return {
+        //删除时的load状态
+        load:false,
         props: {
           stripe: true,
           border: true,
@@ -124,6 +127,8 @@
       //添加顶级菜单
       add() {
         this.$refs.resourceAddRef.model = true
+        this.parentResourceInfo.parentId = 0
+        this.parentResourceInfo.parentName = ''
       },
       //添加子类
       addChild(row) {
@@ -141,12 +146,15 @@
       },
       //获取treegrid数据
       getTreegrid() {
-        this.$Http.pattern = false
-        this.$Http.get("/resource", (result, data) => {
-          if (result) {
-            this.treeTableData = data.data
-          }
-        }, this)
+        this.$store.dispatch("select",{
+          url:"/resource",
+          vue:this,
+          callback:(result, data)=>{
+              if (result) {
+                this.treeTableData = data.data
+              }
+          },
+        })
       },
       //根据id获取
       getById(id) {
@@ -156,6 +164,10 @@
             this.editData = data.data
           }
         }, this)
+      },
+      remove(id){
+        console.log(this.$root.publish_event)
+        vue.$root.publish_event.$emit('auto_remove','/resource/'+id)
       }
     }
   }

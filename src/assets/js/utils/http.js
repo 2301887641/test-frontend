@@ -48,6 +48,14 @@ let http = {
       this.errorHandler(callback, error, vue)
     })
   },
+  // ajax delete请求
+  delete(url,callback,vue){
+    Axios.delete(url).then((response)=>{
+      this.callbackFactory(response,callback,vue)
+    }).catch((error)=>{
+      this.errorHandler(callback,error,vue)
+    })
+  },
   //取消load状态
   unload(vue) {
     if (vue && vue.$data && vue.$data.load) {
@@ -96,11 +104,8 @@ let http = {
             this.success(vue, response)
             break;
           case Constants.statusCode.FATAL_ERROR:
-            vue.$Notice.error({
-              title: "程序异常",
-              desc: "程序发生错误,请联系后台人员!",
-              duration:6,
-            })
+            vue.$Message.destroy()
+            vue.$Message.error("错误通知："+response.data.retInfo)
             break;
           default:
             callback(true, response.data)
@@ -123,8 +128,10 @@ let http = {
   }
 }
 
-export default {
-  install: function (vm) {
-    vm.prototype.$Http = http
-  }
-}
+// export default {
+//   install: function (vm) {
+//     vm.prototype.$Http = http
+//   }
+// }
+
+export default http
