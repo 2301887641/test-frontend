@@ -31,7 +31,7 @@
         </template>
         <template slot="action" slot-scope="scope">
           <Button type="primary" size="small" @click="edit(scope.row.id)">编辑</Button>
-          <Button type="success" size="small" @click="addChild(scope.row)">添加下级</Button>
+          <Button type="success" size="small" @click="addChildView(scope.row)">添加下级</Button>
           <Button type="error" size="small" :loading="load" @click="remove(scope.row.id)">删除</Button>
         </template>
       </zk-table>
@@ -45,7 +45,6 @@
   import topNav from '../../../custom/rightHome/topNav/topNav'
   import Add from './resourceAdd'
   import Edit from './resourceEdit'
-  import vue from 'vue'
 
   export default {
     name: "resource",
@@ -125,16 +124,18 @@
     },
     methods: {
       //添加顶级菜单
-      add() {
+      addView() {
         this.$refs.resourceAddRef.model = true
         this.parentResourceInfo.parentId = 0
         this.parentResourceInfo.parentName = ''
       },
       //添加子类
-      addChild(row) {
+      addChildView(row) {
         this.parentResourceInfo.parentId = row.id
         this.parentResourceInfo.parentName = row.name
         this.$refs.resourceAddRef.model = true
+      },
+      add(){
       },
       edit(id) {
         this.getById(id)
@@ -146,28 +147,24 @@
       },
       //获取treegrid数据
       getTreegrid() {
-        this.$store.dispatch("select",{
-          url:"/resource",
-          vue:this,
-          callback:(result, data)=>{
-              if (result) {
-                this.treeTableData = data.data
-              }
-          },
+        this.$http.get("/resource",this, (result, data) => {
+          if (result) {
+            this.treeTableData = data.data
+          }
         })
       },
       //根据id获取
       getById(id) {
-        this.$Http.pattern = false
-        this.$Http.get("/resource/" + id, (result, data) => {
+        this.$http.get("/resource/" + id,this, (result, data) => {
           if (result) {
             this.editData = data.data
           }
-        }, this)
+        })
       },
       remove(id){
-        console.log(this.$root.publish_event)
-        vue.$root.publish_event.$emit('auto_remove','/resource/'+id)
+        this.$http.delete("/resource/"+id,(result,data)=>{
+
+        },this)
       }
     }
   }

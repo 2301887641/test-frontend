@@ -28,7 +28,7 @@
     },
     methods: {
       add() {
-        this.$parent.add()
+        this.$parent.addView()
       },
       deleteAll() {
         this.$parent.deleteAll()

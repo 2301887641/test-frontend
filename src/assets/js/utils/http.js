@@ -1,46 +1,62 @@
 //axios
-import Axios from 'axios'
-import Constants from './constants'
+import axios from 'axios'
+import constant from './constants'
 
-Axios.defaults.baseURL = Constants.baseConfig.domain
-Axios.defaults.timeout = Constants.axios.timeout
-Axios.defaults.headers['Content-Type'] = Constants.axios.contentType
+axios.defaults.baseURL = constant.baseConfig.domain
+axios.defaults.timeout = constant.axios.timeout
+axios.defaults.headers['Content-Type'] = constant.axios.contentType
 //识别ajax请求
-Axios.defaults.headers['X-Requested-With'] =Constants.axios.xRequestedWith
-Axios.defaults.withCredentials = Constants.axios.withCredentials
+axios.defaults.headers['X-Requested-With'] = constant.axios.xRequestedWith
+axios.defaults.withCredentials = constant.axios.withCredentials
 //qs将axios发送的json转成form-data
 import Qs from 'qs'
 
 let http = {
-  //模式 分为静默和正常  静默模式不会给出反馈信息
-  //true:正常模式  false:静默方式
-  pattern:true,
-  get(url, callback, vue) {
-    Axios.get(url).then((response) => {
-      this.unload(vue)
-      // 正确接收到响应后我们的所有数据都在data里面
-      this.callbackFactory(response, callback, vue)
-      if(!this.pattern){
-        this.pattern=true
+  //vue实例
+  vm: null,
+  //notice组件的error错误提示
+  notice_error: {
+    title: "网络链接异常",
+    desc: "网络连接失败,请检查网络!"
+  },
+  /**
+   * get请求
+   * @param url  请求路径
+   * @param vm  vue实例 一般传递this
+   * @param callback   回调函数
+   */
+  get(url, vm, callback) {
+    this.vm = vm
+    axios.get(url).then((response) => {
+      if (callback && callback instanceof Function) {
+        callback(true, response.data)
       }
     }).catch((error) => {
-      this.unload(vue)
-      this.errorHandler(callback, error, vue)
+      this.error(error)
     })
   },
-  // ajax post请求
-  post(url, data, callback, vue) {
-    Axios.post(url, Qs.stringify(data)).then((response) => {
-      this.unload(vue)
-      this.callbackFactory(response, callback, vue)
+  /**
+   * post请求
+   * @param url  地址
+   * @param data  数据
+   * @param vm   vue实例
+   * @param callback  回调
+   */
+  post(url, data, vm, callback) {
+    if(!vm){
+      console.log("post方法中请传递vue实例")
+    }
+    this.vm = vm
+    axios.post(url, Qs.stringify(data)).then((response) => {
+      this.success(response.data, callback)
     }).catch((error) => {
-      this.unload(vue)
-      this.errorHandler(callback, error, vue)
+      this.unload()
+      this.error(error)
     })
   },
   // ajax put请求
   put(url, data, callback, vue) {
-    Axios.put(url, Qs.stringify(data)).then((response) => {
+    axios.put(url, Qs.stringify(data)).then((response) => {
       this.unload(vue)
       this.callbackFactory(response, callback, vue)
     }).catch((error) => {
@@ -49,17 +65,68 @@ let http = {
     })
   },
   // ajax delete请求
-  delete(url,callback,vue){
-    Axios.delete(url).then((response)=>{
-      this.callbackFactory(response,callback,vue)
-    }).catch((error)=>{
-      this.errorHandler(callback,error,vue)
+  delete(url, callback, vm) {
+    this.vm = vm
+    axios.delete(url).then((response) => {
+      this.refresh()
+      callback(true, response.data)
+    }).catch((error) => {
+      this.error(error)
     })
   },
-  //取消load状态
-  unload(vue) {
-    if (vue && vue.$data && vue.$data.load) {
-      vue.$data.load = false
+  /**
+   * 成功后的回调
+   * @param msg 成功信息
+   */
+  success(data, callback) {
+    if (callback && callback instanceof Function) {
+      callback(true, data.data)
+    }
+    this.unload()
+    this.refresh()
+    this.vm.$Message.success(data.retInfo)
+  },
+  /**
+   * 成功后的刷新操作
+   */
+  refresh() {
+    if (this.vm.refresh && (this.vm.refresh instanceof Function)) {
+      this.vm.refresh()
+    }
+  },
+  /**
+   * 发生错误的回调
+   * @param error
+   */
+  error(error) {
+    //说明已经连接了网络
+    if (error.response && error.response.status) {
+      if (error.response.status == 401) {
+        this.notice_error.title = "授权失败"
+        this.notice_error.desc = "当前用户登陆失败"
+      } else {
+        this.notice_error.title = "网络繁忙"
+        this.notice_error.desc = error.response.data.retInfo
+      }
+    }
+    //网络异常
+    this.noticeError()
+  },
+  /**
+   * notice组件的error异常
+   */
+  noticeError() {
+    this.vm.$Notice.error({
+      title: this.notice_error.title,
+      desc: this.notice_error.desc
+    })
+  },
+  /**
+   * 取消load状态
+   */
+  unload() {
+    if (this.vm && this.vm.$data && this.vm.$data.load) {
+      this.vm.$data.load = false
     }
   },
   //错误处理器
@@ -71,11 +138,11 @@ let http = {
       switch (error.response.status) {
         case 401:
           notice.title = "认证异常"
-          notice.desc = Constants.user.authorationError
+          notice.desc = constant.user.authorationError
           break;
         case 500:
           notice.title = "程序异常"
-          notice.desc = Constants.user.fatalError
+          notice.desc = constant.user.fatalError
           break;
         default:
           break;
@@ -98,14 +165,14 @@ let http = {
     switch (response.status) {
       case 200:
         switch (response.data.retCode) {
-          case Constants.statusCode.SUCCESS:
+          case constant.statusCode.SUCCESS:
             callback(true, response.data)
             //弹窗提示成功
             this.success(vue, response)
             break;
-          case Constants.statusCode.FATAL_ERROR:
+          case constant.statusCode.FATAL_ERROR:
             vue.$Message.destroy()
-            vue.$Message.error("错误通知："+response.data.retInfo)
+            vue.$Message.error("错误通知：" + response.data.retInfo)
             break;
           default:
             callback(true, response.data)
@@ -117,7 +184,7 @@ let http = {
     }
   },
   //成功后的自动处理
-  success(vue, response) {
+  success2(vue, response) {
     if (!!this.pattern && response.data.retInfo != undefined && response.data.retInfo.length > 0) {
       vue.$Notice.success({title: response.data.retInfo})
     }
@@ -128,10 +195,8 @@ let http = {
   }
 }
 
-// export default {
-//   install: function (vm) {
-//     vm.prototype.$Http = http
-//   }
-// }
-
-export default http
+export default {
+  install: function (vm) {
+    vm.prototype.$http = http
+  }
+}
