@@ -53,5 +53,5 @@ let vue=new Vue({
 })
 //初始化操作
 vue.$Message.config({
-  duration: 5
+  duration: 3
 });

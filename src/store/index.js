@@ -2,7 +2,6 @@ import Vuex from 'vuex'
 import Vue from 'vue'
 //加载子模块
 import menu from './modules/menu'
-import http from './modules/http'
 
 Vue.use(Vuex)
 
@@ -17,8 +16,7 @@ const store = new Vuex.Store({
 
   },
   modules:{
-    menu,
-    http
+    menu
   }
 })
 export default store

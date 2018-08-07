@@ -184,19 +184,14 @@
         this.model = false
       },
       refresh() {
-        this.$parent.refresh()
         this.remove()
+        this.$parent.getTreegrid()
       },
       addOk() {
         this.$refs.form.validate((validate) => {
           if (validate && this.verifyParentId()) {
             this.load = true
-            this.$Http.put("/resource", this.form, (result, data) => {
-              //重置表单
-              if (result) {
-                this.refresh()
-              }
-            }, this)
+            this.$http.put("/resource", this.form,this)
           }
         })
       },
@@ -216,9 +211,13 @@
           this.$Message.error("不能将自己设为上级资源")
           return false
         }
+
         return true
       },
-      //点击treeselect删除时回调
+      /**
+       * 点击treeselect删除时回调
+       * @returns {boolean}
+       */
       clearAll() {
         this.form.parentId = 0
         return true
