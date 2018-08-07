@@ -14,7 +14,7 @@
     <div class="action">
       <span>
         <Button type="error" icon="trash-a" @click="deleteAll">批量删除</Button>
-        <Button type="info" icon="ios-search" @click="add">添加</Button>
+        <Button type="info" icon="ios-search" @click="addView">添加</Button>
       </span>
     </div>
   </div>
@@ -27,7 +27,7 @@
       return {}
     },
     methods: {
-      add() {
+      addView() {
         this.$parent.addView()
       },
       deleteAll() {

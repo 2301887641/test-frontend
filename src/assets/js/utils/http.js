@@ -26,6 +26,9 @@ let http = {
    * @param callback   回调函数
    */
   get(url, vm, callback) {
+    if (!vm) {
+      console.log("get方法中请传递vue实例")
+    }
     this.vm = vm
     axios.get(url).then((response) => {
       if (callback && callback instanceof Function) {
@@ -43,7 +46,7 @@ let http = {
    * @param callback  回调
    */
   post(url, data, vm, callback) {
-    if(!vm){
+    if (!vm) {
       console.log("post方法中请传递vue实例")
     }
     this.vm = vm
@@ -55,22 +58,29 @@ let http = {
     })
   },
   // ajax put请求
-  put(url, data, callback, vue) {
+  put(url, data, vm, callback) {
+    if (!vm) {
+      console.log("put方法中请传递vue实例")
+    }
+    this.vm = vm
     axios.put(url, Qs.stringify(data)).then((response) => {
-      this.unload(vue)
-      this.callbackFactory(response, callback, vue)
+      this.success(response.data, callback)
     }).catch((error) => {
-      this.unload(vue)
-      this.errorHandler(callback, error, vue)
+      console.log(error)
+      this.unload()
+      this.error(error)
     })
   },
   // ajax delete请求
-  delete(url, callback, vm) {
+  delete(url, vm, callback) {
+    if (!vm) {
+      console.log("delete方法中请传递vue实例")
+    }
     this.vm = vm
     axios.delete(url).then((response) => {
-      this.refresh()
-      callback(true, response.data)
+      this.success(response.data, callback)
     }).catch((error) => {
+      this.unload()
       this.error(error)
     })
   },
@@ -99,6 +109,7 @@ let http = {
    * @param error
    */
   error(error) {
+    console.log(error)
     //说明已经连接了网络
     if (error.response && error.response.status) {
       if (error.response.status == 401) {
@@ -129,70 +140,6 @@ let http = {
       this.vm.$data.load = false
     }
   },
-  //错误处理器
-  errorHandler(callback, error, vue) {
-    let notice = {title: "网络异常", desc: "网络连接异常,请联系客服!", duration: 6}
-    // 请求已发出，但服务器响应的状态码不在 2xx 范围内
-    if (error.response && error.response.status) {
-      vue.$Message.destroy()
-      switch (error.response.status) {
-        case 401:
-          notice.title = "认证异常"
-          notice.desc = constant.user.authorationError
-          break;
-        case 500:
-          notice.title = "程序异常"
-          notice.desc = constant.user.fatalError
-          break;
-        default:
-          break;
-      }
-      vue.$Notice.error({
-        title: notice.title,
-        desc: notice.desc,
-        duration: notice.duration,
-      })
-      return
-    }
-    vue.$Notice.error({
-      title: notice.title,
-      desc: notice.desc,
-      duration: notice.duration,
-    })
-  },
-  // 回调
-  callbackFactory(response, callback, vue) {
-    switch (response.status) {
-      case 200:
-        switch (response.data.retCode) {
-          case constant.statusCode.SUCCESS:
-            callback(true, response.data)
-            //弹窗提示成功
-            this.success(vue, response)
-            break;
-          case constant.statusCode.FATAL_ERROR:
-            vue.$Message.destroy()
-            vue.$Message.error("错误通知：" + response.data.retInfo)
-            break;
-          default:
-            callback(true, response.data)
-            break;
-        }
-        break;
-      default:
-        break;
-    }
-  },
-  //成功后的自动处理
-  success2(vue, response) {
-    if (!!this.pattern && response.data.retInfo != undefined && response.data.retInfo.length > 0) {
-      vue.$Notice.success({title: response.data.retInfo})
-    }
-    //如果vue视图上有模型model的话关闭掉。
-    if (vue.$data.model !== undefined && !!vue.$data.model) {
-      vue.$data.model = false
-    }
-  }
 }
 
 export default {

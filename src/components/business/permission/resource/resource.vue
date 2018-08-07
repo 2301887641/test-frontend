@@ -127,7 +127,7 @@
       addView() {
         this.$refs.resourceAddRef.model = true
         this.parentResourceInfo.parentId = 0
-        this.parentResourceInfo.parentName = ''
+        this.parentResourceInfo.parentName = '顶级资源'
       },
       //添加子类
       addChildView(row) {
@@ -135,15 +135,9 @@
         this.parentResourceInfo.parentName = row.name
         this.$refs.resourceAddRef.model = true
       },
-      add(){
-      },
       edit(id) {
         this.getById(id)
         this.$refs.resourceEditRef.model = true
-      },
-      //子组件成功刷新
-      refresh() {
-        this.getTreegrid()
       },
       //获取treegrid数据
       getTreegrid() {
@@ -161,10 +155,15 @@
           }
         })
       },
+      refresh(){
+        this.getTreegrid()
+      },
+      /**
+       * 根据id删除
+       * @param id
+       */
       remove(id){
-        this.$http.delete("/resource/"+id,(result,data)=>{
-
-        },this)
+        this.$http.delete("/resource/"+id,this)
       }
     }
   }

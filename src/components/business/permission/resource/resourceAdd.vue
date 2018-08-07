@@ -181,8 +181,8 @@
       },
       //刷新操作
       refresh() {
-        this.$parent.getTreegrid()
         this.remove()
+        this.$parent.getTreegrid()
       },
       //确定
       addOk() {
