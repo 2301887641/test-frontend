@@ -58,8 +58,8 @@
             </Form-item>
             <Form-item label="资源类型:" prop="resourceType">
               <RadioGroup v-model="form.resourceType" type="button">
-                <Radio :label="0">菜单</Radio>
-                <Radio :label="1">按钮</Radio>
+                <Radio :label="enums.menu">菜单</Radio>
+                <Radio :label="enums.button">按钮</Radio>
               </RadioGroup>
             </Form-item>
             <Form-item label="权限标识:" prop="code">
@@ -104,15 +104,19 @@
         iconData: this.getIcon(),
         //icon实例
         iconInstance: new iconMap(),
+        enums:{
+          button:this.$constants.enum.resource.Button,
+          menu:this.$constants.enum.resource.Menu
+        },
         form: {
           parentId: this.parentResourceInfo.parentId,
           name: '',
           icon: '',
-          resourceType: 0,
+          resourceType: this.$constants.enum.resource.Menu,
           code: '',
           url: '',
           priority: 0,
-          path: '',
+          description:'',
           parentName: this.parentResourceInfo.parentName
         },
         verifyRule: {
@@ -141,7 +145,6 @@
       },
       'parentResourceInfo.parentId'() {
         this.form.parentId = this.parentResourceInfo.parentId
-        this.form.path = this.parentResourceInfo.parentId
       }
     },
     props: {

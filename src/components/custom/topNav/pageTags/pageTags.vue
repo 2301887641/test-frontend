@@ -82,9 +82,9 @@
       },1)
     },
     beforeCreate(){
-      this.$root.publish_openMenu.$on('openMenu', (name) => {
-        this.openMenu(name)
-      })
+      // this.$root.publish_openMenu.$on('openMenu', (name) => {
+      //   this.openMenu(name)
+      // })
     },
     methods: {
       //标签选项处理

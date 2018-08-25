@@ -22,7 +22,7 @@
         :expand-type="props.expandType"
         :selection-type="props.selectionType">
         <template slot="type" slot-scope="scope">
-          <span v-if="scope.row.resourceType==zero"><Icon type="grid"></Icon>&nbsp;菜单</span>
+          <span v-if="scope.row.resourceType==menu"><Icon type="grid"></Icon>&nbsp;菜单</span>
           <span v-else><Icon type="android-radio-button-on"></Icon>&nbsp;按钮</span>
         </template>
         <template slot="icon" slot-scope="scope">
@@ -37,7 +37,7 @@
       </zk-table>
     </div>
     <Add ref="resourceAddRef" :parentResourceInfo="parentResourceInfo"/>
-    <Edit ref="resourceEditRef" :form="editData" :treeSelect="treeTableData" :parentId="editData.parentId"/>
+    <Edit ref="resourceEditRef" :form="editData" :treeSelect="selectTableData" :parentId="editData.parentId"/>
   </div>
 </template>
 
@@ -51,7 +51,7 @@
     data() {
       return {
         //删除时的load状态
-        load:false,
+        load: false,
         props: {
           stripe: true,
           border: true,
@@ -105,10 +105,11 @@
         ],
         //表格树数据
         treeTableData: [],
+        selectTableData: [],
         //获取修改数据 必须定义成对象格式，否则报警告
         editData: {},
         //enum数值
-        zero: this.$constants.enum.resource.Menu,
+        menu: this.$constants.enum.resource.Menu,
         //父级资源信息
         parentResourceInfo: {
           parentId: 0,
@@ -117,7 +118,7 @@
       }
     },
     created() {
-      this.getTreegrid()
+      this.refresh()
     },
     components: {
       Add, topNav, Edit
@@ -140,30 +141,36 @@
         this.$refs.resourceEditRef.model = true
       },
       //获取treegrid数据
-      getTreegrid() {
-        this.$http.get("/resource",this, (result, data) => {
+      getTreegrid(id) {
+        let path = (!!id) ? "/resource?id=" + id : "/resource"
+        this.$http.get(path, this, (result, data) => {
           if (result) {
+            if (!!id) {
+              this.selectTableData = data.data
+              return
+            }
             this.treeTableData = data.data
           }
         })
       },
       //根据id获取
       getById(id) {
-        this.$http.get("/resource/" + id,this, (result, data) => {
+        this.$http.get("/resource/" + id, this, (result, data) => {
           if (result) {
             this.editData = data.data
+            this.getTreegrid(id)
           }
         })
       },
-      refresh(){
+      refresh() {
         this.getTreegrid()
       },
       /**
        * 根据id删除
        * @param id
        */
-      remove(id){
-        this.$http.delete("/resource/"+id,this)
+      remove(id) {
+        this.$http.delete("/resource/" + id, this)
       }
     }
   }

@@ -57,6 +57,7 @@
                 :normalizer="normalizer"
                 :beforeClearAll="clearAll"
                 @select="select"
+                noOptionsText="没有资源可选"
                 placeholder="顶级资源"
               />
             </Form-item>
@@ -68,8 +69,8 @@
             </Form-item>
             <Form-item label="资源类型:" prop="resourceType">
               <RadioGroup v-model="form.resourceType" type="button">
-                <Radio :label="0">菜单</Radio>
-                <Radio :label="1">按钮</Radio>
+                <Radio :label="enums.menu">菜单</Radio>
+                <Radio :label="enums.button">按钮</Radio>
               </RadioGroup>
             </Form-item>
             <Form-item label="权限标识:" prop="code">
@@ -140,6 +141,11 @@
         iconData: this.getIcon(),
         //icon实例
         iconInstance: new iconMap(),
+        //枚举
+        enums: {
+          menu: this.$constants.enum.resource.Menu,
+          button: this.$constants.enum.resource.Button
+        },
         //验证规则
         verifyRule: {
           name: [
@@ -188,10 +194,12 @@
         this.$parent.getTreegrid()
       },
       addOk() {
+        //拷贝对象
+        let form = Object.assign({},this.form,{id:""})
         this.$refs.form.validate((validate) => {
           if (validate && this.verifyParentId()) {
             this.load = true
-            this.$http.put("/resource", this.form,this)
+            this.$http.put("/resource/" + this.form.id, form, this)
           }
         })
       },
@@ -207,11 +215,13 @@
       //验证parentId
       verifyParentId() {
         if (this.form.parentId == this.form.id) {
-          this.$Message.destroy()
-          this.$Message.error("不能将自己设为上级资源")
+          this.$Notice.destroy()
+          this.$Notice.error({
+            title: "错误",
+            desc: "不能将自己设为上级资源"
+          })
           return false
         }
-
         return true
       },
       /**

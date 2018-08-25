@@ -29,7 +29,7 @@ let http = {
     if (!vm) {
       console.log("get方法中请传递vue实例")
     }
-    this.vm = vm
+    this.vm=vm
     axios.get(url).then((response) => {
       if (callback && callback instanceof Function) {
         callback(true, response.data)
@@ -89,10 +89,19 @@ let http = {
    * @param msg 成功信息
    */
   success(data, callback) {
-    if (callback && callback instanceof Function) {
+    this.unload()
+    if(data.retCode=="500"){
+      this.vm.$Notice.destroy()
+      this.vm.$Notice.error({
+        title:"错误",
+        desc:data.retInfo,
+        top:1000
+      })
+      return
+    }
+    if(callback && callback instanceof Function) {
       callback(true, data.data)
     }
-    this.unload()
     this.refresh()
     this.vm.$Message.success(data.retInfo)
   },
@@ -144,6 +153,7 @@ let http = {
 
 export default {
   install: function (vm) {
+    // http.vm=vm.prototype
     vm.prototype.$http = http
   }
 }

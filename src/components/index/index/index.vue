@@ -211,27 +211,10 @@
       ok() {
 
       },
-      //通用删除事件
-      remove(url,callback){
-        this.$Http.delete(url,(result,data)=>{
-          if(result){
-
-          }
-        },this)
-      }
     },
     created(){
       //清除登陆loding
       this.$Spin.hide()
-    },
-    beforeCreate(){
-      //通用删除事件
-      this.$root.publish_event.$on('auto_remove',(url,callback)=>{
-        this.remove(url,callback)
-        if(callback instanceof Function){
-          callback()
-        }
-      })
     },
     components: {
       todoList,countCard,mapService,chinaMap

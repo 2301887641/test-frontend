@@ -12,7 +12,6 @@ const CONSTANTS = {
   //axios配置
   axios:{
     contentType: 'application/x-www-form-urlencoded',
-    // xRequestedWith:'XMLHttpRequest',
     timeout: 1000 * 15,
     //跨域必开
     withCredentials:true,
@@ -48,8 +47,8 @@ const CONSTANTS = {
   //枚举
   enum:{
     resource:{
-      Menu:0,
-      Button:1
+      Menu:1,
+      Button:2
     }
   }
 }

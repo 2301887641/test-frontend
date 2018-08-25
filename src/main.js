@@ -53,5 +53,8 @@ let vue=new Vue({
 })
 //初始化操作
 vue.$Message.config({
-  duration: 3
+  duration: 5
+});
+vue.$Notice.config({
+  duration: 5
 });
