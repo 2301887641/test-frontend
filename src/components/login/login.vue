@@ -73,8 +73,7 @@
         formData: {
           username: '',
           password: '',
-          captcha: '',
-          client_name: this.$constants.baseConfig.restClient
+          captcha: ''
         },
         //验证规则
         verifyRule: {
@@ -102,25 +101,25 @@
         this.$refs[name].validate((valid) => {
           if (!valid) {
             this.load = false
-            return false
+            return
           }
-          this.load = true
-          this.$Http.post("login", this.formData, (status, result) => {
+          // this.load = true
+          this.$http.post("authentication/form", this.formData, (status, result) => {
             if (status) {
-              switch (result.retCode) {
-                case this.$constants.statusCode.CAPTCHA_ERROR:
-                  this.$Message.error({
-                    content: result.retInfo,
-                    duration: 5,
-                    closable: true
-                  })
-                  break;
-                case this.$constants.statusCode.SUCCESS:
-                  this.$Spin.show()
-                  this.$lockr.set(this.$constants.user.token, result.data.token)
-                  this.$router.replace("index")
-                  break;
-              }
+              // switch (result.retCode) {
+              //   case this.$constants.statusCode.CAPTCHA_ERROR:
+              //     this.$Message.error({
+              //       content: result.retInfo,
+              //       duration: 5,
+              //       closable: true
+              //     })
+              //     break;
+              //   case this.$constants.statusCode.SUCCESS:
+              //     this.$Spin.show()
+              //     this.$lockr.set(this.$constants.user.token, result.data.token)
+              //     this.$router.replace("index")
+              //     break;
+              // }
             }
           }, this)
         })
